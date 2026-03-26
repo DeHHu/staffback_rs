@@ -1,0 +1,15 @@
+[package]
+name = "staffback_rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+#serde = { version = "1.0", features = ["derive"] }
+#serde_json = "1.0.149"
+uuid = { version = "1", features = ["v4", "serde"] }
+rand = "0.8"
+chrono = { version = "0.4", features = ["serde"] }
+#back
+rocket = { version = "0.5.1", features = ["json"] }
+rocket_cors = "0.6.0"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
