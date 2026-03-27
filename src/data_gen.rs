@@ -3,6 +3,7 @@ use rand::Rng;
 use rand::seq::SliceRandom;
 use std::{mem, vec};
 
+#[derive(Debug, Clone)]
 pub struct DataSet {
     pub members: Vec<StaffMember>,
     pub oivs: Vec<Oiv>,
@@ -382,7 +383,7 @@ pub fn get_dataset(base_url: &str) -> DataSet {
         let n = rand::thread_rng().gen_range(1..=20);
 
         let photo_url: String = if divided_by_3 {
-            format!("{0}/w40k/{1}.jpg", base_url, n)
+            format!("{0}/public/w40k/{1}.jpg", base_url, n)
         } else {
             String::default()
         };

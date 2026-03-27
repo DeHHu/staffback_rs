@@ -162,6 +162,12 @@ pub struct Oiv {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
+pub struct OivList {
+    pub oivs: Vec<Oiv>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct Filter {
     pub oiv: Option<Vec<u32>>,
     pub organisations: Option<Vec<String>>,
@@ -191,7 +197,7 @@ pub struct StaffListFilter {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct StaffRequestParams {
-    pub filters: Option<StaffListFilter>,
+    pub filters: Option<Filter>,
     pub limit: u32,
     pub query: Option<String>,
     pub after_id: Option<String>,

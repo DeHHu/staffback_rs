@@ -1,58 +1,103 @@
 #[macro_use]
 extern crate rocket;
-use rocket::serde::json::Json;
+use rocket::{State, fs::FileServer, http::Status, serde::json::Json};
+use rocket_cors::Guard;
+use std::env;
+use std::path::PathBuf;
+use std::sync::Mutex;
 
-use crate::models::{
-    AllStaff, BasicResponse, Filter, StaffInfo, StaffList, StaffListFilter, StaffMember,
-    StaffRequestParams,
+use crate::{
+    data_gen::DataSet,
+    models::{
+        AllStaff, BasicResponse, Filter, OivList, StaffInfo, StaffList, StaffListFilter,
+        StaffMember, StaffRequestParams,
+    },
 };
 mod data_gen;
 mod models;
 
-#[get("/")]
-fn index() -> Json<BasicResponse<AllStaff>> {
-    let set = data_gen::get_dataset("https://ya.ru");
-    let params = StaffRequestParams {
-        filters: Option::Some(StaffListFilter {
-            filters: Filter {
-                oiv: Option::Some(vec![3]),
-                organisations: Option::None,
-                products: Option::None,
-                subdivisions: Option::None,
-                positions: Option::None,
-                addresses: Option::None,
-                locations: Option::None,
-                gender: Option::Some(String::from("female")),
-                statuses: Option::None,
-                employed_date_range: Option::None,
-            },
-        }),
-        limit: 20,
-        query: Option::Some(String::from("Л")),
-        after_id: Option::None,
+struct AppState {
+    staff: DataSet,
+}
+// type ApiResult<T> = Result<Json<BasicResponse<T>>, (Status, Json<BasicResponse<T>>)>;
+
+fn base_url() -> String {
+    env::var("BASE_URL").unwrap_or_else(|_| "http://localhost:8000".to_string())
+}
+
+#[rocket::get("/image-link")]
+fn image_link() -> String {
+    format!("{}/images/logo.png", base_url())
+}
+
+#[post("/v1/colleagues", format = "application/json", data = "<params>")]
+fn colleagues(
+    state: &State<AppState>,
+    params: Result<Json<StaffRequestParams>, rocket::serde::json::Error<'_>>,
+) -> (Status, Json<BasicResponse<AllStaff>>) {
+    let params = match params {
+        Ok(params) => params.into_inner(),
+        Err(e) => {
+            println!("{:?}", e);
+            return (
+                Status::BadRequest,
+                Json(BasicResponse::error("invalid request json")),
+            );
+        }
     };
+    let filtered_members = get_members(&state.staff.members, &params);
+    (
+        Status::Ok,
+        Json(BasicResponse::ok(AllStaff {
+            last_i_d: Option::None,
+            list: filtered_members,
+        })),
+    )
+}
 
-    let filtered_members = get_members(set.members, params);
-
-    Json(BasicResponse::ok(AllStaff {
-        last_i_d: Option::None,
-        list: filtered_members,
-    }))
+#[post("/v1/colleagues/oivs", format = "application/json", data = "<params>")]
+fn oivs(
+    state: &State<AppState>,
+    params: Result<Json<StaffRequestParams>, rocket::serde::json::Error<'_>>,
+) -> (Status, Json<BasicResponse<OivList>>) {
+    let params = match params {
+        Ok(params) => params.into_inner(),
+        Err(e) => {
+            return (
+                Status::BadRequest,
+                Json(BasicResponse::error("invalid request json")),
+            );
+        }
+    };
+    (
+        Status::Ok,
+        Json(BasicResponse::ok(OivList {
+            oivs: state.staff.oivs.clone(),
+        })),
+    )
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![index])
+    let loaded = dotenvy::dotenv();
+    println!("dotenv loaded: {:?}", loaded);
+    println!("BASE_URL = {:?}", std::env::var("BASE_URL"));
+    let state = AppState {
+        staff: data_gen::get_dataset(&base_url()),
+    };
+    let public_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("public");
+    rocket::build()
+        .manage(state)
+        .mount("/", routes![colleagues, oivs])
+        .mount("/public", FileServer::from(public_dir))
 }
-// fn main() {
 
-// }
-
-fn get_members(members: Vec<StaffMember>, params: StaffRequestParams) -> Vec<StaffMember> {
-    let mut members = members;
+fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<StaffMember> {
+    let mut members = members.clone();
+    let params = params.clone();
 
     if let Some(f) = params.filters {
-        if let Some(oivs) = f.filters.oiv {
+        if let Some(oivs) = f.oiv {
             if !oivs.is_empty() {
                 members = members
                     .into_iter()
@@ -71,7 +116,7 @@ fn get_members(members: Vec<StaffMember>, params: StaffRequestParams) -> Vec<Sta
             }
         }
 
-        if let Some(gender) = f.filters.gender {
+        if let Some(gender) = f.gender {
             members = members
                 .into_iter()
                 .filter(|s| s.gender.as_ref().is_some_and(|o| *o == gender))
