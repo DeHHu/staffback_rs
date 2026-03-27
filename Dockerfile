@@ -12,5 +12,6 @@ FROM debian:bookworm-slim
 WORKDIR /app
 
 COPY --from=builder /app/target/release/staffback_rs /usr/local/bin/staffback_rs
+COPY --from=builder /app/public /app/public
 
 CMD ["staffback_rs"]
