@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
+COPY public ./public
 
 RUN cargo build --release
 
@@ -12,6 +13,6 @@ FROM debian:bookworm-slim
 WORKDIR /app
 
 COPY --from=builder /app/target/release/staffback_rs /usr/local/bin/staffback_rs
-COPY --from=builder /app/public /usr/local/bin/public
+COPY --from=builder /app/public /app/public
 
 CMD ["staffback_rs"]
