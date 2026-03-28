@@ -1,7 +1,7 @@
 use crate::models::{Minister, Oiv, StaffInfo, StaffMember, Status};
 use rand::Rng;
 use rand::seq::SliceRandom;
-use std::{mem, vec};
+use std::vec;
 
 #[derive(Debug, Clone)]
 pub struct DataSet {
