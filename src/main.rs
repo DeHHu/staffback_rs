@@ -82,13 +82,13 @@ fn rocket() -> _ {
     let loaded = dotenvy::dotenv();
     println!("dotenv loaded: {:?}", loaded);
     println!("BASE_URL = {:?}", std::env::var("BASE_URL"));
-    println!("public_dir = {:?}", public_dir);
-    println!("exists = {:?}", std::path::Path::new(&public_dir).exists());
-    println!("is_dir = {:?}", std::path::Path::new(&public_dir).is_dir());
     let state = AppState {
         staff: data_gen::get_dataset(&base_url()),
     };
     let public_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("public");
+    println!("public_dir = {:?}", public_dir);
+    println!("exists = {:?}", std::path::Path::new(&public_dir).exists());
+    println!("is_dir = {:?}", std::path::Path::new(&public_dir).is_dir());
     rocket::build()
         .manage(state)
         .mount("/", routes![colleagues, oivs])
