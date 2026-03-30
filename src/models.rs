@@ -80,7 +80,7 @@ impl Status {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct AllStaff {
-    pub last_i_d: Option<String>,
+    pub last_id: Option<String>,
     pub list: Vec<StaffMember>,
 }
 
@@ -198,7 +198,7 @@ pub struct StaffListFilter {
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct StaffRequestParams {
     pub filters: Option<Filter>,
-    pub limit: u32,
+    pub limit: Option<u32>,
     pub query: Option<String>,
     pub after_id: Option<String>,
 }
