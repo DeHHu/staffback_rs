@@ -1,6 +1,4 @@
-use std::{fmt::format, iter::Product};
-
-use rocket::serde::{Deserialize, Serialize, json::Json};
+use rocket::serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize)]
@@ -10,9 +8,13 @@ where
     T: Serialize,
 {
     pub data: Option<T>,
-    pub is_error: Option<bool>,
-    pub error_description: Option<String>,
+    pub error: Option<ResponseError>,
     pub timestamp: Option<String>,
+}
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde", rename_all = "camelCase")]
+pub struct ResponseError {
+    pub message: Option<String>,
 }
 
 impl<T> BasicResponse<T>
@@ -22,8 +24,7 @@ where
     pub fn ok(data: T) -> Self {
         Self {
             data: Some(data),
-            is_error: Some(false),
-            error_description: None,
+            error: None,
             timestamp: Some(chrono::Utc::now().to_rfc3339()),
         }
     }
@@ -31,20 +32,21 @@ where
     pub fn error(msg: &str) -> Self {
         Self {
             data: None,
-            is_error: Some(true),
-            error_description: Some(msg.to_string()),
+            error: Some(ResponseError {
+                message: Some(msg.to_string()),
+            }),
             timestamp: Some(chrono::Utc::now().to_rfc3339()),
         }
     }
 }
 
-#[derive(Serialize, Debug, Clone)]
-#[serde(crate = "rocket::serde", rename_all = "camelCase")]
-pub struct StaffList {
-    pub last_id: Option<String>,
-    pub last_name: String,
-    pub age: u32,
-}
+// #[derive(Serialize, Debug, Clone)]
+// #[serde(crate = "rocket::serde", rename_all = "camelCase")]
+// pub struct StaffList {
+//     pub last_id: Option<String>,
+//     pub last_name: String,
+//     pub age: u32,
+// }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
@@ -141,29 +143,48 @@ impl StaffMember {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
-pub struct Minister {
+pub struct Head {
     pub id: u32,
-    pub full_name: String,
     pub first_name: String,
     pub last_name: String,
     pub middle_name: String,
-    pub image_u_r_l: Option<String>,
-    pub description: String,
+    pub position: String,
+    pub image_url: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct Oiv {
     pub id: u32,
+    pub icon_url: Option<String>,
+    pub short_name: String,
     pub name: String,
-    pub count: u32,
-    pub minister: Minister,
+    pub count: Count,
+    pub head: Option<Head>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(crate = "rocket::serde", rename_all = "camelCase")]
+pub struct Count {
+    pub employees: Option<u32>,
+    pub organizations: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
-pub struct OivList {
-    pub oivs: Vec<Oiv>,
+pub struct FilterWrapper {
+    pub filters: Filters,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(crate = "rocket::serde", rename_all = "camelCase")]
+pub struct Filters {
+    pub oiv: Option<Vec<StaffInfo>>,
+    pub organisations: Option<Vec<StaffInfo>>,
+    pub products: Option<Vec<StaffInfo>>,
+    pub subdivisions: Option<Vec<StaffInfo>>,
+    pub positions: Option<Vec<StaffInfo>>,
+    pub addresses: Option<Vec<StaffInfo>>,
+    pub locations: Option<Vec<StaffInfo>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -181,17 +202,28 @@ pub struct Filter {
     pub employed_date_range: Option<EmployedDateRange>,
 }
 
+impl Filter {
+    pub fn empty() -> Self {
+        Self {
+            oiv: Option::None,
+            organisations: Option::None,
+            products: Option::None,
+            subdivisions: Option::None,
+            positions: Option::None,
+            addresses: Option::None,
+            locations: Option::None,
+            gender: Option::None,
+            statuses: Option::None,
+            employed_date_range: Option::None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(crate = "rocket::serde", rename_all = "camelCase")]
 pub struct EmployedDateRange {
     pub from: Option<String>,
     pub to: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(crate = "rocket::serde", rename_all = "camelCase")]
-pub struct StaffListFilter {
-    pub filters: Filter,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

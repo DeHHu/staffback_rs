@@ -1,4 +1,4 @@
-use crate::models::{Minister, Oiv, StaffInfo, StaffMember, Status};
+use crate::models::{Count, Head, Oiv, StaffInfo, StaffMember, Status};
 use rand::Rng;
 use rand::seq::SliceRandom;
 use std::vec;
@@ -7,6 +7,10 @@ use std::vec;
 pub struct DataSet {
     pub members: Vec<StaffMember>,
     pub oivs: Vec<Oiv>,
+    pub organisations: Vec<StaffInfo>,
+    pub products: Vec<StaffInfo>,
+    pub divisions: Vec<StaffInfo>,
+    pub locations: Vec<StaffInfo>,
 }
 
 fn get_organisations() -> Vec<StaffInfo> {
@@ -53,37 +57,37 @@ fn get_locations() -> Vec<StaffInfo> {
     ]
 }
 
-fn get_addresses() -> Vec<StaffInfo> {
-    vec![
-        StaffInfo::new("Armageddon Prime, Hive Tartarus, Level 87, Block K-19-Theta"),
-        StaffInfo::new("Mars, Forge Manufactorum IX, Sub-Level 204-B, Cogitator Vault 7"),
-        StaffInfo::new(
-            "Yakov-Apostol Prime, Plasma-Forges Delta, Turbine Chamber 56, Servitor Bay 312",
-        ),
-        StaffInfo::new("Terra, Holy Terra, Senatorum Spire, Level 999, Apartment Sanctus-42"),
-        StaffInfo::new("Cad ia, Fortress Cadian Gate, Barracks Sector 14, Platoon Quarters Gamma"),
-        StaffInfo::new("Commorragh, Dark Eldar Spire, Torture-Pit XIV, Slave-Quarters Omega"),
-        StaffInfo::new("Cadia, Kasr Vortan, Siege Bastion Delta-9, Shrine of the Emperor’s Wrath"),
-        StaffInfo::new("Holy Terra, Administratum Spire 777, Lex Chamber Primus, Data Sanctum IV"),
-        StaffInfo::new("Armageddon, Hive Helsreach, Manufactorum 12-Gamma, Smog Vent District"),
-        StaffInfo::new("Fenris, Ice Plateau Vargard, Space Wolves Fang, Hall of Echoes"),
-        StaffInfo::new("Macragge, Fortress of Hera, Ultramar Bastion, Honor Hall Omega"),
-        StaffInfo::new("Nocturne, City of Hesiod, Forge Temple XI, Promethium Catacombs"),
-        StaffInfo::new("Necromunda, Underhive Sec-42, Corpse Grinders’ Den, Reclamation Pit Theta"),
-        StaffInfo::new("Commorragh, High Spire Zarakthul,Execution Balcony IX"),
-        StaffInfo::new("Ba’al, Blood Angels Monastery, Reliquary of Sanguinius, Crypt Level XIII"),
-        StaffInfo::new("Medusa, Forge-Spire Tertius, Iron Hands Foundry, Sector Ferrum-9"),
-        StaffInfo::new("Catachan, Deathworld Basin Alpha, Jungle Outpost, Venom Grove Station"),
-        StaffInfo::new("Mars, Noctis Labyrinthus, Forge Temple Omicron, Data Forge 23-Red"),
-        StaffInfo::new("Prospero, City of Tizca, Obsidian Spire, Library of the Pyrae"),
-        StaffInfo::new("Krieg, Siege Zone 445, Bunker Complex Sigma-Prime, Trenches of Faith"),
-        StaffInfo::new("Cadia Ruins, Kasr Myrak, Warped Bastion, Chaos Shrine of Abaddon"),
-        StaffInfo::new("Tanith, Ghost Regiment Camp, Forest Sector 9, Shade Encampment"),
-        StaffInfo::new("Terra, Ecclesiarchal Palace, Basilica Mortis, Catacomb Wing Alpha"),
-        StaffInfo::new("Vostroya, Firstborn Quarter, Manufactorum District, Plasma Refinery Beta"),
-        StaffInfo::new("Cadia Fracture, Warp Rift Zone 13, Blackstone Fragment"),
-    ]
-}
+// fn get_addresses() -> Vec<StaffInfo> {
+//     vec![
+//         StaffInfo::new("Armageddon Prime, Hive Tartarus, Level 87, Block K-19-Theta"),
+//         StaffInfo::new("Mars, Forge Manufactorum IX, Sub-Level 204-B, Cogitator Vault 7"),
+//         StaffInfo::new(
+//             "Yakov-Apostol Prime, Plasma-Forges Delta, Turbine Chamber 56, Servitor Bay 312",
+//         ),
+//         StaffInfo::new("Terra, Holy Terra, Senatorum Spire, Level 999, Apartment Sanctus-42"),
+//         StaffInfo::new("Cad ia, Fortress Cadian Gate, Barracks Sector 14, Platoon Quarters Gamma"),
+//         StaffInfo::new("Commorragh, Dark Eldar Spire, Torture-Pit XIV, Slave-Quarters Omega"),
+//         StaffInfo::new("Cadia, Kasr Vortan, Siege Bastion Delta-9, Shrine of the Emperor’s Wrath"),
+//         StaffInfo::new("Holy Terra, Administratum Spire 777, Lex Chamber Primus, Data Sanctum IV"),
+//         StaffInfo::new("Armageddon, Hive Helsreach, Manufactorum 12-Gamma, Smog Vent District"),
+//         StaffInfo::new("Fenris, Ice Plateau Vargard, Space Wolves Fang, Hall of Echoes"),
+//         StaffInfo::new("Macragge, Fortress of Hera, Ultramar Bastion, Honor Hall Omega"),
+//         StaffInfo::new("Nocturne, City of Hesiod, Forge Temple XI, Promethium Catacombs"),
+//         StaffInfo::new("Necromunda, Underhive Sec-42, Corpse Grinders’ Den, Reclamation Pit Theta"),
+//         StaffInfo::new("Commorragh, High Spire Zarakthul,Execution Balcony IX"),
+//         StaffInfo::new("Ba’al, Blood Angels Monastery, Reliquary of Sanguinius, Crypt Level XIII"),
+//         StaffInfo::new("Medusa, Forge-Spire Tertius, Iron Hands Foundry, Sector Ferrum-9"),
+//         StaffInfo::new("Catachan, Deathworld Basin Alpha, Jungle Outpost, Venom Grove Station"),
+//         StaffInfo::new("Mars, Noctis Labyrinthus, Forge Temple Omicron, Data Forge 23-Red"),
+//         StaffInfo::new("Prospero, City of Tizca, Obsidian Spire, Library of the Pyrae"),
+//         StaffInfo::new("Krieg, Siege Zone 445, Bunker Complex Sigma-Prime, Trenches of Faith"),
+//         StaffInfo::new("Cadia Ruins, Kasr Myrak, Warped Bastion, Chaos Shrine of Abaddon"),
+//         StaffInfo::new("Tanith, Ghost Regiment Camp, Forest Sector 9, Shade Encampment"),
+//         StaffInfo::new("Terra, Ecclesiarchal Palace, Basilica Mortis, Catacomb Wing Alpha"),
+//         StaffInfo::new("Vostroya, Firstborn Quarter, Manufactorum District, Plasma Refinery Beta"),
+//         StaffInfo::new("Cadia Fracture, Warp Rift Zone 13, Blackstone Fragment"),
+//     ]
+// }
 
 fn get_names() -> Vec<String> {
     vec![
@@ -447,47 +451,59 @@ pub fn get_dataset(base_url: &str) -> DataSet {
 
     let emp_childs = Oiv {
         id: 1,
+        icon_url: None,
+        short_name: "Дети Императора".to_string(),
         name: "Дети Императора".to_string(),
-        count: emp_childs_count,
-        minister: Minister {
+        count: Count {
+            employees: Some(emp_childs_count),
+            organizations: Some(0),
+        },
+        head: Some(Head {
             id: 101,
             first_name: "Фулгрим".to_string(),
             middle_name: "".to_string(),
             last_name: "".to_string(),
-            full_name: "Фулгрим".to_string(),
-            image_u_r_l: Option::Some("/w40k/fg.jpg".to_string()),
-            description: "Примарх ДИТ".to_string(),
-        },
+            position: "Примарх ДИТ".to_string(),
+            image_url: Option::Some(format!("{0}/public/w40k/{1}.jpg", base_url, "fg")),
+        }),
     };
 
     let space_wolves = Oiv {
         id: 2,
+        icon_url: None,
+        short_name: "Космические Волки".to_string(),
         name: "Космические Волки".to_string(),
-        count: wolves_count,
-        minister: Minister {
+        count: Count {
+            employees: Some(wolves_count),
+            organizations: Some(0),
+        },
+        head: Some(Head {
             id: 102,
             first_name: "Леман".to_string(),
             middle_name: "".to_string(),
             last_name: "Русс".to_string(),
-            full_name: "Леман Русс".to_string(),
-            image_u_r_l: Option::Some("/w40k/lr.jpg".to_string()),
-            description: "Примарх ГИН".to_string(),
-        },
+            position: "Примарх ГИН".to_string(),
+            image_url: Option::Some(format!("{0}/public/w40k/{1}.jpg", base_url, "lr")),
+        }),
     };
 
     let ultramarines = Oiv {
         id: 3,
+        icon_url: None,
+        short_name: "Ультрамарины".to_string(),
         name: "Ультрамарины".to_string(),
-        count: ultramarines_count,
-        minister: Minister {
+        count: Count {
+            employees: Some(ultramarines_count),
+            organizations: Some(0),
+        },
+        head: Some(Head {
             id: 103,
             first_name: "Робаут".to_string(),
             middle_name: "".to_string(),
             last_name: "Жиллиман".to_string(),
-            full_name: "Робаут Жиллиман".to_string(),
-            image_u_r_l: Option::Some("/w40k/rg.jpg".to_string()),
-            description: "Примарх МосГорТРАНСов".to_string(),
-        },
+            position: "Примарх МосГорТРАНСов".to_string(),
+            image_url: Option::Some(format!("{0}/public/w40k/{1}.jpg", base_url, "rg")),
+        }),
     };
 
     oivs.push(emp_childs);
@@ -497,5 +513,9 @@ pub fn get_dataset(base_url: &str) -> DataSet {
     DataSet {
         members: members,
         oivs: oivs,
+        organisations: get_organisations(),
+        products: get_products(),
+        divisions: get_divisions(),
+        locations: get_locations(),
     }
 }

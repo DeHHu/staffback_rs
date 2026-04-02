@@ -1,16 +1,14 @@
 #[macro_use]
 extern crate rocket;
 use rocket::{State, fs::FileServer, http::Status, serde::json::Json};
-use rocket_cors::Guard;
 use std::env;
 use std::path::PathBuf;
-use std::sync::Mutex;
 
 use crate::{
     data_gen::DataSet,
     models::{
-        AllStaff, BasicResponse, Filter, OivList, StaffInfo, StaffList, StaffListFilter,
-        StaffMember, StaffRequestParams,
+        AllStaff, BasicResponse, Filter, FilterWrapper, Filters, Oiv, StaffInfo, StaffMember,
+        StaffRequestParams,
     },
 };
 mod data_gen;
@@ -25,16 +23,16 @@ fn base_url() -> String {
     env::var("BASE_URL").unwrap_or_else(|_| "http://localhost:8000".to_string())
 }
 
-#[rocket::get("/image-link")]
-fn image_link() -> String {
-    format!("{}/images/logo.png", base_url())
-}
-
-#[post("/v1/colleagues", format = "application/json", data = "<params>")]
-fn colleagues(
+#[post(
+    "/mobile/employees/v1/search",
+    format = "application/json",
+    data = "<params>"
+)]
+async fn colleagues(
     state: &State<AppState>,
     params: Result<Json<StaffRequestParams>, rocket::serde::json::Error<'_>>,
 ) -> (Status, Json<BasicResponse<AllStaff>>) {
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
     let params = match params {
         Ok(params) => params.into_inner(),
         Err(e) => {
@@ -55,14 +53,26 @@ fn colleagues(
     )
 }
 
-#[post("/v1/colleagues/oivs", format = "application/json", data = "<params>")]
-fn oivs(
+#[get("/mobile/employees/v1/portals")]
+async fn oivs(state: &State<AppState>) -> (Status, Json<BasicResponse<Vec<Oiv>>>) {
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+    let oivs: Vec<Oiv> = state.staff.oivs.clone();
+    (Status::Ok, Json(BasicResponse::ok(oivs)))
+}
+
+#[post(
+    "/mobile/employees/v1/search/filters",
+    format = "application/json",
+    data = "<params>"
+)]
+async fn filters(
     state: &State<AppState>,
     params: Result<Json<StaffRequestParams>, rocket::serde::json::Error<'_>>,
-) -> (Status, Json<BasicResponse<OivList>>) {
+) -> (Status, Json<BasicResponse<FilterWrapper>>) {
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
     let params = match params {
         Ok(params) => params.into_inner(),
-        Err(e) => {
+        Err(_) => {
             return (
                 Status::BadRequest,
                 Json(BasicResponse::error("invalid request json")),
@@ -71,8 +81,8 @@ fn oivs(
     };
     (
         Status::Ok,
-        Json(BasicResponse::ok(OivList {
-            oivs: state.staff.oivs.clone(),
+        Json(BasicResponse::ok(FilterWrapper {
+            filters: get_filters(&params, &state.staff),
         })),
     )
 }
@@ -91,7 +101,7 @@ fn rocket() -> _ {
     println!("is_dir = {:?}", std::path::Path::new(&public_dir).is_dir());
     rocket::build()
         .manage(state)
-        .mount("/", routes![colleagues, oivs])
+        .mount("/", routes![colleagues, oivs, filters])
         .mount("/public", FileServer::from(public_dir))
 }
 
@@ -99,34 +109,39 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
     let mut members = members.clone();
     let params = params.clone();
 
-    if let Some(f) = params.filters {
-        if let Some(oivs) = f.oiv {
-            if !oivs.is_empty() {
-                members = members
-                    .into_iter()
-                    .filter(|f| {
-                        if let Some(oiv) = f.oiv.as_ref() {
-                            let oiv_id_i32 = oiv.id.parse::<i32>().unwrap_or(-1);
-                            if oiv_id_i32 < 0 {
-                                return false;
-                            }
-                            let oiv_id: u32 = oiv_id_i32 as u32;
-                            return oivs.contains(&oiv_id);
-                        }
-                        false
-                    })
-                    .collect();
-            }
-        }
+    let filter = match params.filters {
+        Some(filter) => filter,
+        None => Filter::empty(),
+    };
 
-        if let Some(gender) = f.gender {
-            members = members
-                .into_iter()
-                .filter(|s| s.gender.as_ref().is_some_and(|o| *o == gender))
-                .collect();
-        }
+    let params_oivs = filter.oiv.unwrap_or(Vec::new());
+
+    if !params_oivs.is_empty() {
+        members = members
+            .into_iter()
+            .filter(|f| {
+                let Some(oiv) = f.oiv.clone() else {
+                    return false;
+                };
+
+                let Some(id) = oiv.id.parse::<u32>().ok() else {
+                    return false;
+                };
+                params_oivs.contains(&id)
+            })
+            .collect();
     }
-
+    if let Some(gender) = filter.gender {
+        members = members
+            .into_iter()
+            .filter(|s| {
+                let Some(staff_gender) = s.gender.clone() else {
+                    return false;
+                };
+                staff_gender == gender
+            })
+            .collect();
+    }
     if let Some(query) = params.query {
         if !query.is_empty() {
             members = members
@@ -135,7 +150,6 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
                 .collect();
         }
     }
-
     if let Some(last_id) = params.after_id {
         if !last_id.is_empty() {
             if let Some(index) = members.iter().position(|x| x.id == last_id) {
@@ -151,4 +165,68 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
         }
     }
     members.iter().take(20).cloned().collect()
+}
+
+fn get_filters(params: &StaffRequestParams, data: &DataSet) -> Filters {
+    let mut filters = Filters {
+        oiv: Option::None,
+        organisations: Option::None,
+        products: Option::None,
+        subdivisions: Option::None,
+        positions: Option::None,
+        addresses: Option::None,
+        locations: Option::None,
+    };
+    let oivs: Vec<StaffInfo> = data
+        .oivs
+        .iter()
+        .map(|oiv| StaffInfo {
+            id: oiv.id.clone().to_string(),
+            name: oiv.name.clone(),
+        })
+        .collect();
+
+    let params_oivs: &[u32] = params
+        .filters
+        .as_ref()
+        .and_then(|f| f.oiv.as_deref())
+        .unwrap_or(&[]);
+
+    let params_addresses: &[String] = params
+        .filters
+        .as_ref()
+        .and_then(|f| f.addresses.as_deref())
+        .unwrap_or(&[]);
+
+    let params_organisations: &[String] = params
+        .filters
+        .as_ref()
+        .and_then(|f| f.organisations.as_deref())
+        .unwrap_or(&[]);
+
+    let params_subdivisions: &[String] = params
+        .filters
+        .as_ref()
+        .and_then(|f| f.subdivisions.as_deref())
+        .unwrap_or(&[]);
+
+    filters.oiv = Option::Some(oivs);
+
+    if !params_addresses.is_empty() || !params_oivs.is_empty() {
+        filters.organisations = Option::Some(data.organisations.clone());
+    }
+    if !params_oivs.is_empty() {
+        filters.products = Option::Some(data.products.clone());
+    }
+    if !params_organisations.is_empty() && !params_addresses.is_empty() {
+        filters.subdivisions = Option::Some(data.divisions.clone());
+    }
+    if !params_organisations.is_empty()
+        && !params_addresses.is_empty()
+        && !params_oivs.is_empty()
+        && !params_subdivisions.is_empty()
+    {
+        filters.locations = Option::Some(data.locations.clone());
+    }
+    filters
 }
