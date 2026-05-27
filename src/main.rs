@@ -1,9 +1,11 @@
 #[macro_use]
 extern crate rocket;
 use rocket::{State, fs::FileServer, http::Status, serde::json::Json};
-use std::env;
+use std::ops::Deref;
 use std::path::PathBuf;
+use std::{env, path::Component::ParentDir};
 
+use crate::models::Count;
 use crate::{
     data_gen::DataSet,
     models::{
@@ -43,7 +45,7 @@ async fn colleagues(
             );
         }
     };
-    let filtered_members = get_members(&state.staff.members, &params);
+    let filtered_members = get_members(&state.staff.members, &params, false);
     (
         Status::Ok,
         Json(BasicResponse::ok(AllStaff {
@@ -53,10 +55,49 @@ async fn colleagues(
     )
 }
 
-#[get("/mobile/employees/v1/portals")]
-async fn oivs(state: &State<AppState>) -> (Status, Json<BasicResponse<Vec<Oiv>>>) {
+#[post(
+    "/mobile/employees/v1/portals",
+    format = "application/json",
+    data = "<params>"
+)]
+async fn oivs(
+    state: &State<AppState>,
+    params: Result<Json<StaffRequestParams>, rocket::serde::json::Error<'_>>,
+) -> (Status, Json<BasicResponse<Vec<Oiv>>>) {
     tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-    let oivs: Vec<Oiv> = state.staff.oivs.clone();
+    let params = match params {
+        Ok(params) => params.into_inner(),
+        Err(_) => {
+            return (
+                Status::BadRequest,
+                Json(BasicResponse::error("invalid request json")),
+            );
+        }
+    };
+    let members = get_members(&state.staff.members, &params, true);
+    let mut oivs: Vec<Oiv> = vec![];
+    for oiv in state.staff.oivs.clone() {
+        let filtered_members: Vec<&StaffMember> = members
+            .iter()
+            .filter(|member| match &member.oiv {
+                Some(m) => {
+                    return m.id == oiv.id.to_string();
+                }
+                None => return false,
+            })
+            .collect();
+        oivs.push(Oiv {
+            id: oiv.id,
+            icon_url: oiv.icon_url,
+            short_name: oiv.short_name,
+            name: oiv.name,
+            count: Count {
+                employees: Some(filtered_members.len() as u32),
+                organizations: oiv.count.organizations,
+            },
+            head: oiv.head,
+        });
+    }
     (Status::Ok, Json(BasicResponse::ok(oivs)))
 }
 
@@ -105,7 +146,11 @@ fn rocket() -> _ {
         .mount("/public", FileServer::from(public_dir))
 }
 
-fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<StaffMember> {
+fn get_members(
+    members: &Vec<StaffMember>,
+    params: &StaffRequestParams,
+    takeAll: bool,
+) -> Vec<StaffMember> {
     let mut members = members.clone();
     let params = params.clone();
 
@@ -116,6 +161,7 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
 
     let params_oivs = filter.oiv.unwrap_or(Vec::new());
 
+    let limit: usize = params.limit.unwrap_or(20) as usize;
     if !params_oivs.is_empty() {
         members = members
             .into_iter()
@@ -150,12 +196,15 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
                 .collect();
         }
     }
+    if takeAll {
+        return members;
+    }
     if let Some(last_id) = params.after_id {
         if !last_id.is_empty() {
             if let Some(index) = members.iter().position(|x| x.id == last_id) {
                 if index + 1 < members.len() {
-                    let mut last = index + 20;
-                    if index + 20 >= members.len() {
+                    let mut last = index + limit;
+                    if index + limit >= members.len() {
                         last = members.len() - 1
                     }
                     return members[index + 1..last].to_vec();
@@ -164,7 +213,7 @@ fn get_members(members: &Vec<StaffMember>, params: &StaffRequestParams) -> Vec<S
             return Vec::new();
         }
     }
-    members.iter().take(20).cloned().collect()
+    members.iter().take(limit).cloned().collect()
 }
 
 fn get_filters(params: &StaffRequestParams, data: &DataSet) -> Filters {
