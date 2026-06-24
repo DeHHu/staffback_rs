@@ -1,18 +1,18 @@
 # .woodpecker.yml
-
 steps:
-  test:
+  build:
     image: rust:1-bookworm
     commands:
-      - cargo test
-      - cargo clippy -- -D warnings
+      - cargo build --release
+      - mkdir -p dist
+      - cp target/release/staffback_rs dist/
+      - tar -czf dist/staffback_rs-linux-x86_64.tar.gz -C dist staffback_rs
 
-  deploy:
-    image: docker:cli
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  upload:
+    image: minio/mc
+    environment:
+      MC_HOST_minio:
+        from_secret: uEIihSXSf73KYAvlxsiz:3Vs88c3m4C7OuUA1HvRGitJZ0OrvmU8TEOEuGTPL@http://192.168.0.33:30320
     commands:
-      - docker compose up -d --build
-      - docker image prune -f
-    when:
-      branch: main
+      - mc cp dist/staffback_rs-linux-x86_64.tar.gz minio/releases/pkpass/${CI_COMMIT_SHA}.tar.gz
+      - mc cp dist/staffback_rs-linux-x86_64.tar.gz minio/releases/pkpass/latest.tar.gz
