@@ -1,9 +1,11 @@
 services:
-  app:
-    build: .
+  staffback_rs:
     container_name: staffback_rs
-    restart: unless-stopped
+    environment:
+      BASE_URL: http://192.168.0.33
+      ROCKET_ADDRESS: 0.0.0.0
+      ROCKET_PORT: 3000
+    image: ghcr.io/dehhu/staffback_rs:master
     ports:
-      - "3000:3000"
-    env_file:
-      - .env
+      - '3000:3000'
+    restart: unless-stopped
