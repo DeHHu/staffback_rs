@@ -12,7 +12,11 @@ steps:
     image: minio/mc
     environment:
       MC_HOST_minio:
+<<<<<<< HEAD
         from_secret: minio_host
+=======
+        from_secret: uEIihSXSf73KYAvlxsiz:3Vs88c3m4C7OuUA1HvRGitJZ0OrvmU8TEOEuGTPL@http://192.168.0.33:30320
+>>>>>>> 5a70d5d0275c2502441f9d2bc61db4366785ed11
     commands:
       - mc cp dist/staffback_rs-linux-x86_64.tar.gz minio/releases/pkpass/${CI_COMMIT_SHA}.tar.gz
       - mc cp dist/staffback_rs-linux-x86_64.tar.gz minio/releases/pkpass/latest.tar.gz
