@@ -79,12 +79,7 @@ async fn oivs(
     for oiv in state.staff.oivs.clone() {
         let filtered_members: Vec<&StaffMember> = members
             .iter()
-            .filter(|member| match &member.oiv {
-                Some(m) => {
-                    return m.id == oiv.id.to_string();
-                }
-                None => return false,
-            })
+            .filter(|member| member.oiv.id == oiv.id.to_string())
             .collect();
         oivs.push(Oiv {
             id: oiv.id,
@@ -166,9 +161,7 @@ fn get_members(
         members = members
             .into_iter()
             .filter(|f| {
-                let Some(oiv) = f.oiv.clone() else {
-                    return false;
-                };
+                let oiv = f.oiv.clone();
 
                 let Some(id) = oiv.id.parse::<u32>().ok() else {
                     return false;
