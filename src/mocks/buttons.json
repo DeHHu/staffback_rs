@@ -1,0 +1,30 @@
+{
+  "isError": false,
+  "data": [
+    {
+      "image": {
+        "assetName": "",
+        "url": ""
+      },
+      "type": "default",
+      "url": null,
+      "subtitle": "",
+      "title": "Календарь занятости",
+      "idButton": "calendar",
+      "id": "61896b10-856a-11ea-9111-005056a27cd7"
+    },
+    {
+      "image": {
+        "assetName": "",
+        "url": ""
+      },
+      "type": "default",
+      "url": null,
+      "subtitle": "",
+      "title": "Следующий отпуск",
+      "idButton": "nextHoliday",
+      "id": "3989de2d-92b7-11ea-9111-005056a27cd7"
+    }
+  ],
+  "timestamp": "2026-08-19T08:57:33"
+}

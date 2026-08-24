@@ -1,0 +1,153 @@
+{
+  "isError": false,
+  "data": {
+    "countOfSubscribers": 12,
+    "funcBoss": {
+      "imageURL": "https://cfc.mos.ru/mobileproxy/hs/mobileproxy/v4/images/b15a4cc4-a64a-4d1f-8688-58716be938d3?size=Small&v=20241022150757",
+      "role": "Руководитель направления по электронному кадровому документообороту",
+      "gender": "Male",
+      "name": "Куликов Павел Владимирович",
+      "id": "b15a4cc4-a64a-4d1f-8688-58716be938d3"
+    },
+    "cellPhone": "+7 985 711-77-83",
+    "birthDayFormatted": "03 ноября 1993",
+    "imageURL": "https://cfc.mos.ru/mobileproxy/hs/mobileproxy/v4/images/c64e6882-7ff9-4951-9576-1a925552549b?size=Large&v=20241003114723",
+    "assignmentType": "Основное место работы",
+    "isMainEmployment": true,
+    "relatedEmployees": [
+      {
+        "assignmentType": "Основное место работы",
+        "isMainEmployment": true,
+        "company": "ГКУ «Инфогород»",
+        "department": "Отдел исследований и разработок",
+        "position": "Программист",
+        "name": "Балашов Артем Игоревич",
+        "id": "c64e6882-7ff9-4951-9576-1a925552549b"
+      },
+      {
+        "assignmentType": "Внутреннее совместительство",
+        "isMainEmployment": false,
+        "company": "ГКУ «Адептус Астартес»",
+        "department": "Отдел моления богу машине",
+        "position": "Наладчик оборудования",
+        "name": "Балашов Артем Игоревич",
+        "id": "c64e6882-7ff9-4951-9576-1a925552549c"
+      }
+    ],
+    "orgBoss": {
+      "imageURL": "https://cfc.mos.ru/mobileproxy/hs/mobileproxy/v4/images/b15a4cc4-a64a-4d1f-8688-58716be938d3?size=Small&v=20241022150757",
+      "department": "Отдел исследований и разработок",
+      "position": "Начальник отдела",
+      "name": "Куликов Павел Владимирович",
+      "company": {
+        "iconURL": "",
+        "name": "ГКУ «Инфогород»",
+        "id": "5f7ff025-b3a0-11e4-a57b-d8d385db247f"
+      },
+      "gender": "Male",
+      "id": "b15a4cc4-a64a-4d1f-8688-58716be938d3"
+    },
+    "vaccinated": false,
+    "subscribed": true,
+    "ranges": [
+      {
+        "description": "Занят с 11:30 до 12:30",
+        "to": "2026-08-17T12:30:00",
+        "from": "2026-08-17T11:30:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 13:00 до 14:00",
+        "to": "2026-08-17T14:00:00",
+        "from": "2026-08-17T13:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 11:30 до 12:30",
+        "to": "2026-08-18T12:30:00",
+        "from": "2026-08-18T11:30:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 13:00 до 14:00",
+        "to": "2026-08-18T14:00:00",
+        "from": "2026-08-18T13:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 09:00 до 12:30",
+        "to": "2026-08-19T12:30:00",
+        "from": "2026-08-19T09:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 13:00 до 14:00",
+        "to": "2026-08-19T14:00:00",
+        "from": "2026-08-19T13:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 13:00 до 14:00",
+        "to": "2026-08-20T14:00:00",
+        "from": "2026-08-20T13:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 09:00 до 10:00",
+        "to": "2026-08-21T10:00:00",
+        "from": "2026-08-21T09:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 11:30 до 12:30",
+        "to": "2026-08-21T12:30:00",
+        "from": "2026-08-21T11:30:00",
+        "type": "busy"
+      },
+      {
+        "description": "Занят с 13:00 до 14:00",
+        "to": "2026-08-21T14:00:00",
+        "from": "2026-08-21T13:00:00",
+        "type": "busy"
+      },
+      {
+        "description": "",
+        "to": "2026-08-22T20:00:00",
+        "from": "2026-08-22T08:00:00",
+        "type": "weekend"
+      },
+      {
+        "description": "",
+        "to": "2026-08-23T20:00:00",
+        "from": "2026-08-23T08:00:00",
+        "type": "weekend"
+      }
+    ],
+    "department": "Отдел исследований и разработок",
+    "isIntern": false,
+    "workPhone": {
+      "ext": "",
+      "main": "8 (495) 957-93-57"
+    },
+    "room": "503",
+    "employmentDate": "2020-02-18T00:00:00",
+    "product": {
+      "iconURL": "",
+      "name": "Облако",
+      "id": "2569dd8e-9907-11e5-a9d6-d8d385db247f"
+    },
+    "company": {
+      "iconURL": "",
+      "name": "ГКУ «Инфогород»",
+      "id": "5f7ff025-b3a0-11e4-a57b-d8d385db247f"
+    },
+    "gender": "Мужской",
+    "address": "115114, Москва г, вн.тер. г. муниципальный округ Даниловский, ул Кожевническая, д. 14, стр. 5",
+    "position": "программист",
+    "email": "BalashovAI@it.mos.ru",
+    "name": "Балашов Артем Игоревич",
+    "chatUID": "usrTn3v0xhZipg",
+    "id": "c64e6882-7ff9-4951-9576-1a925552549b"
+  },
+  "timestamp": "2026-08-19T08:57:33"
+}

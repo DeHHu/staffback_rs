@@ -1,0 +1,40 @@
+{
+  "isError": false,
+  "data": {
+    "switchers": [
+      {
+        "title": "Push-уведомления",
+        "switchers": [
+          {
+            "id": "subscribers",
+            "title": "Уведомления по подпискам",
+            "subtitle": "",
+            "isOn": true
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "title": "Сотрудники",
+        "items": [
+          {
+            "subscriptionInfo": {
+              "birthdayTime": "00:00",
+              "birthdayDaysBefore": 0,
+              "isBirthdayChecked": false,
+              "isHRChecked": true
+            },
+            "gender": "Мужской",
+            "imageURL": "https://cfc.mos.ru/mobileproxy/hs/mobileproxy/v4/images/c64e6882-7ff9-4951-9576-1a925552549b?size=Small&v=20241003114723",
+            "subtitle": "программист",
+            "title": "Балашов Артем Игоревич",
+            "id": "c64e6882-7ff9-4951-9576-1a925552549b"
+          }
+        ]
+      }
+    ],
+    "total": 1
+  },
+  "timestamp": "2026-08-19T08:57:33+03:00"
+}
