@@ -63,8 +63,8 @@ fn get_profile_from_colleague(member: StaffMember, base_url: &str) -> profile::P
             icon: String::from(""),
         },
         legal_entity: ProfileInfo {
-            name: String::from(""),
-            icon: String::from(""),
+            name: String::from("Облако"),
+            icon: format!("{0}/public/w40k/11.jpg", base_url),
         },
         structure: Structure {
             position: String::from(
